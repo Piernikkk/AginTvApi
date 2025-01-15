@@ -1,0 +1,15 @@
+openapi: '3.0.3'
+info:
+  title: Agin TV Api
+  version: '1.0'
+servers:
+  - url: https://tvapi.agin.rocks
+    description: Production server
+  - url: http://localhost:42070
+    description: Development server
+paths:
+  /test:
+    get:
+      responses:
+        '200':
+          description: OK
