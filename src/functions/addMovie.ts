@@ -18,7 +18,7 @@ export type getEpisodeProps ={
 }
 
 async function getEpisodes({movieID, tmdbData}: getEpisodeProps){
-    const episodeIDs : Types.ObjectId[] = [];
+    const episodeIDs : {id: Types.ObjectId, season: number | null | undefined, episode: number | null | undefined}[] = [];
 
     await Promise.all(tmdbData?.data?.seasons?.map(async (s: any) => {
         const season = await TMDB.get(`/tv/${movieID.substring(1)}/season/${s.season_number}`);
@@ -31,12 +31,21 @@ async function getEpisodes({movieID, tmdbData}: getEpisodeProps){
                 duration: e?.runtime,
             }, { upsert: true, returnDocument: 'after' });
             
-            episodeIDs.push(episode._id);
+            episodeIDs.push({id: episode._id, season: episode.season, episode: episode.episode});
         }));
     }))
-    
+
+    episodeIDs.sort((a, b) => {
+        if (a.season == null && b.season == null) {
+          return (a.episode ?? Infinity) - (b.episode ?? Infinity);
+        }
+        if (a.season == null) return 1;
+        if (b.season == null) return -1;
+        if (a.season !== b.season) return a.season - b.season;
+        return (a.episode ?? Infinity) - (b.episode ?? Infinity);
+      });
+
     return episodeIDs;
-    
 }
 
 async function getGenres({tmdbData}: any){
@@ -65,7 +74,8 @@ export default async function addMovieFromTMDB({movieID, res}: addMovieProps){
     const genres = await getGenres({tmdbData});
     
     if(isTV){
-        episodeIDs = await getEpisodes({movieID, tmdbData});
+        const episodes = await getEpisodes({movieID, tmdbData});
+        episodeIDs = episodes.map((e) => e?.id);
     }else{
         const episode = await Episode.findOneAndUpdate({
             season: 0,

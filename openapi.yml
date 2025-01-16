@@ -10,14 +10,15 @@ servers:
 paths: 
   /movies/{movieID}:
     get:
-      summary: 'Get movie details'
-      description: 'Returns every information in database about given movie'
+      summary: Get movie details
+      description: Returns every information in database about given movie
       parameters: 
         - in: path
           name: movieID
           schema: 
             type: string
           required: true
+          example: t123
           description: Slightly modificated ID provided by TMDB
         - in: query
           name: refresh
@@ -42,6 +43,42 @@ paths:
                   error:
                     type: string
                     example: "Invalid ID"
+  /movies/{movieID}/episodes/{episodeID}:
+    get:
+      summary: Get episode details
+      description: Returns every information in database about given episode
+      parameters: 
+        - in: path
+          name: movieID
+          schema: 
+            type: string
+          required: true
+          description: Slightly modificated ID provided by TMDB
+          example: t123
+        - in: path
+          name: episodeID
+          schema: 
+            type: string
+          required: true
+          description: Season number and episode number separated by semicon
+          example: 1,2
+      responses:
+        '200':
+          description: Successful Response with episode information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Episode'
+        '404':
+          description: Episode doesn't exist or coresponding movie not in the database yet
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Episode not found or doesn't exist in the database"
 components:
   schemas:
     Movie:

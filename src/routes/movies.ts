@@ -1,12 +1,15 @@
 import express from 'express';
 import Movie from './../models/Movie';
 import addMovieFromTMDB from '../functions/addMovie';
+import episodes from './episodes';
 
 const movies = express.Router();
 
-movies.get('/', async (req, res) => {
-    res.json({route: 'movies'});
-});
+export interface MovieParams {
+    movieID: string,
+}
+
+movies.use('/:movieID/episodes', episodes);
 
 movies.use('/:movieID', (req, res, next) => {
     const { movieID } = req?.params;
@@ -15,21 +18,21 @@ movies.use('/:movieID', (req, res, next) => {
 });
 
 
-movies.get('/:movieID', async (req,res) => {
+movies.get('/:movieID', async (req, res) => {
     const { movieID } = req?.params;
     const refresh = req.query?.refresh == 'true';
-    if(refresh){
-        await addMovieFromTMDB({movieID, res});
+    if (refresh) {
+        await addMovieFromTMDB({ movieID, res });
         return;
     }
 
-    const database = await Movie.findOne({tmdb_id: movieID}).populate('episodes').populate('genres');
-    
-    if(database == null){
-        await addMovieFromTMDB({movieID,res});
+    const database = await Movie.findOne({ tmdb_id: movieID }).populate('episodes').populate('genres');
+
+    if (database == null) {
+        await addMovieFromTMDB({ movieID, res });
         return;
     }
-    
+
     res.json(database);
     return;
 });
