@@ -1,6 +1,6 @@
 import express from 'express';
 import Movie from './../models/Movie';
-import addMovie from '../functions/addMovie';
+import addMovieFromTMDB from '../functions/addMovie';
 
 const movies = express.Router();
 
@@ -18,11 +18,20 @@ movies.use('/:movieID', (req, res, next) => {
 movies.get('/:movieID', async (req,res) => {
     const { movieID } = req?.params;
     const refresh = req.query?.refresh == 'true';
-    await addMovie({movieID});
+    if(refresh){
+        await addMovieFromTMDB({movieID, res});
+        return;
+    }
 
-    // const localDatabase = await Movie.findOne({tmdb_id: movieID}).populate('episodes');
-
-    res.sendStatus(200);
+    const database = await Movie.findOne({tmdb_id: movieID}).populate('episodes').populate('genres');
+    
+    if(database == null){
+        await addMovieFromTMDB({movieID,res});
+        return;
+    }
+    
+    res.json(database);
+    return;
 });
 
 export default movies;

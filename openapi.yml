@@ -7,9 +7,157 @@ servers:
     description: Production server
   - url: http://localhost:42070
     description: Development server
-paths:
-  /test:
+paths: 
+  /movies/{movieID}:
     get:
+      summary: 'Get movie details'
+      description: 'Returns every information in database about given movie'
+      parameters: 
+        - in: path
+          name: movieID
+          schema: 
+            type: string
+          required: true
+          description: Slightly modificated ID provided by TMDB
+        - in: query
+          name: refresh
+          schema:
+            type: boolean
+          required: false
+          description: When true server will use TMDB and not database to refresh outdated data
       responses:
         '200':
-          description: OK
+          description: Successful Response with movie information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Movie'
+        '404':
+          description: Movie not found or TMDB didn't respond correctly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Invalid ID"
+components:
+  schemas:
+    Movie:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID given by mongoDB
+        tmdb_id:
+          type: string
+          description: Slightly modificated ID provided by TMDB
+        name: 
+          type: string
+          description: Name of the movie or tv series
+        original_name:
+          type: string
+          description: Name of the movie or tv series in original language
+        description:
+          type: string
+          description: Description of the movie or tv series
+        tv:
+          type: boolean
+          description: Indicates if tv series (true) or movie (false)
+        air_date:
+          type: string
+          description: Air date when movie or first episode air date when tv show
+        horizontal_cover_url:
+          type: string
+          description: Url with horizontal cover image
+        vertical_cover_url:
+          type: string
+          description: Url with vertical cover image
+        background_url:
+          type: string
+          description: Url with background image
+        logo_url:
+          type: string
+          description: Url with logo image
+        seasons:
+          type: array
+          items: 
+            type: object
+            properties:
+              _id:
+                type: string
+                description: ID given by mongoDB
+              season_number:
+                type: number
+                description: Number of the season
+              name:
+                type: string
+                description: Name of the season
+              description:
+                type: string
+                description: Description of the season
+              air_date:
+                type: string
+                description: Air date of the first episode in the season
+              vertical_cover_url:
+                type: string
+                description: Url with vertical cover image
+        episodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Episode'
+        genres:
+          type: array
+          items:
+            $ref: '#/components/schemas/Genre'
+    Episode: 
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID given by mongoDB
+        season:
+          type: number
+          description: Number of the epsode's season
+        episode:
+          type: number
+          description: Number of the epsode 
+        name:
+          type: string
+          description: Name of the episode
+        description:
+          type: string
+          description: Description of the episode
+        tmdb_movie_id:
+          type: string
+          description: tmdb_id of the episode's tv series 
+        air_date:
+          type: string
+          description: Air date of the episode
+        duration:
+          type: number
+          description: Duration of the episode in minutes
+        cover_url:
+          type: string
+          description: Url with cover image
+    Genre: 
+      type: object
+      description: Genre with ID provided by TMDB
+      properties:
+        _id:
+          type: string
+          description: ID given by mongoDB
+        tmdb_id: 
+          type: number
+          description: ID provided by TMDB
+        name: 
+          type: string
+          description: name of the genre
+    
+
+        
+
+        
+
+        

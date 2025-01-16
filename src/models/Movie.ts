@@ -19,6 +19,8 @@ const movieSchema = new mongoose.Schema({
         season_number: Number,
         name: String,
         air_date: Date,
+        description: String,
+        vertical_cover_url: String,
     }],
     episodes: [{
         type: mongoose.SchemaTypes.ObjectId,
