@@ -29,6 +29,7 @@ async function getEpisodes({ movieID, tmdbData }: getEpisodeProps) {
                 air_date: new Date(e?.air_date),
                 cover_url: e?.still_path,
                 duration: e?.runtime,
+                movie_name: tmdbData?.data?.name,
             }, { upsert: true, returnDocument: 'after' });
 
             episodeIDs.push({ id: episode._id, season: episode.season, episode: episode.episode });
@@ -81,6 +82,7 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
             season: 0,
             episode: 0,
             tmdb_movie_id: movieID,
+            movie_name: tmdbData?.data?.title,
         }, {}, { upsert: true, returnDocument: 'after' })
         episodeIDs = [episode._id];
     }

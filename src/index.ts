@@ -4,6 +4,7 @@ import mongoose from 'mongoose';
 import movies from './routes/movies';
 import home from './routes/home';
 import user from './routes/user';
+import withAuth from './functions/withAuth';
 
 const app = express();
 

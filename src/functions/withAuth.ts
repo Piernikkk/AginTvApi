@@ -1,10 +1,13 @@
+import mongoose from "mongoose";
 import Token from "../models/Token";
 import { NextFunction, Request, Response } from "express";
+import Episode, { EpisodeType } from "../models/Episode";
 
 declare module "express-serve-static-core" {
     interface Request {
-        token?: any;
+        token?: { token: string, grantedAt: NativeDate };
         user?: any;
+        episode?: EpisodeType;
     }
 }
 
@@ -29,7 +32,7 @@ export default async function withAuth(req: Request<withAuthParams>, res: Respon
 
     const isTokenValid = await Token.findOne({ token }).populate('user');
 
-    if (!isTokenValid) {
+    if (!isTokenValid || isTokenValid.token == undefined || isTokenValid.grantedAt == undefined) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
     }
@@ -57,7 +60,7 @@ export async function withAdminAuth(req: Request<withAuthParams>, res: Response<
 
     const isTokenValid = await Token.findOne({ token }).populate('user');
 
-    if (!isTokenValid) {
+    if (!isTokenValid || isTokenValid.token == undefined || isTokenValid.grantedAt == undefined) {
         res.status(401).json({ error: 'Unauthorized' });
         return;
     }

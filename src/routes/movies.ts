@@ -2,10 +2,11 @@ import express from 'express';
 import Movie from './../models/Movie';
 import addMovieFromTMDB from '../functions/addMovie';
 import episodes from './episodes';
+import { withAuthParams } from '../functions/withAuth';
 
 const movies = express.Router({ mergeParams: true });
 
-export interface MovieParams {
+export interface MovieParams extends withAuthParams {
     movieID: string,
 }
 
