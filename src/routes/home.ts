@@ -1,14 +1,13 @@
 import Movie from '../models/Movie';
 import express from 'express';
 import Slide from '../models/Slide';
+import withAuth from '../functions/withAuth';
+import Position from '../models/Position';
+import Episode from '../models/Episode';
 
 const home = express.Router({ mergeParams: true });
 
-
-
-
-
-home.get('/', async (req, res) => {
+home.get('/', withAuth, async (req, res) => {
     const homeMovies = await Slide.find().populate({ path: 'movie', model: Movie });
 
     const carousel = homeMovies.map((hm) => {
@@ -19,14 +18,13 @@ home.get('/', async (req, res) => {
             description: hm.movie?.description,
             logo_url: hm.movie?.logo_url
         }
-    })
+    });
 
-    // const carousel = await Promise.all(homeMovies.map(async (hm) => {
-    //     const movie = await Movie.findById({ _id: hm })
-    //     return { tmdb_id: movie?.tmdb_id, name: movie?.name, background_url: movie?.background_url, description: movie?.description, logo_url: movie?.logo_url }
-    // }));
+    const user = req?.user;
 
-    res.json({ carousel });
+    const continueWatching = await Position.find({ user: user?._id }).populate({ path: 'episode', model: Episode }).select('-__v');
+
+    res.json({ carousel, continueWatching });
     return;
 });
 

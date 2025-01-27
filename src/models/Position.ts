@@ -11,7 +11,7 @@ const positionSchema = new mongoose.Schema({
         ref: 'User'
     },
     position: Number,
-    durration: Number,
+    duration: Number,
     link: String,
 });
 

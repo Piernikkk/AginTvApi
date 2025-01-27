@@ -66,9 +66,12 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
         return res.status(404).json({ error: 'Invalid ID' });
     }
 
-    const horizontal_cover_url = 'https://image.tmdb.org/t/p/original' + (tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == 'en')?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == tmdbData?.data?.original_language)?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == null)?.file_path || tmdbData?.data?.images?.backdrops[0]?.file_path)
+    const horizontal_cover = (tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == 'en')?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == tmdbData?.data?.original_language)?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == null)?.file_path || tmdbData?.data?.images?.backdrops[0]?.file_path)
+    const horizontal_cover_url = !horizontal_cover ? null : ('https://image.tmdb.org/t/p/original' + horizontal_cover)
 
-    const logo_url = 'https://image.tmdb.org/t/p/original' + (tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == 'en')?.file_path || tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == tmdbData?.data?.original_language)?.file_path || tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == null)?.file_path || tmdbData?.data?.images?.logos[0]?.file_path)
+
+    const logo = (tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == 'en')?.file_path || tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == tmdbData?.data?.original_language)?.file_path || tmdbData?.data?.images?.logos?.find((l: any) => l.iso_639_1 == null)?.file_path || tmdbData?.data?.images?.logos[0]?.file_path)
+    const logo_url = !logo ? null : ('https://image.tmdb.org/t/p/original' + logo);
 
     let episodeIDs: Types.ObjectId[] = [];
 
@@ -93,16 +96,16 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
         description: tmdbData?.data?.overview,
         tv: isTV,
         air_date: isTV ? new Date(tmdbData?.data?.first_air_date) : new Date(tmdbData?.data?.release_date),
-        vertical_cover_url: 'https://image.tmdb.org/t/p/original' + tmdbData?.data?.poster_path,
+        vertical_cover_url: !tmdbData?.data?.poster_path ? null : ('https://image.tmdb.org/t/p/original' + tmdbData?.data?.poster_path),
         horizontal_cover_url,
-        background_url: 'https://image.tmdb.org/t/p/original' + tmdbData?.data?.backdrop_path,
+        background_url: !tmdbData?.data?.backdrop_path ? null : ('https://image.tmdb.org/t/p/original' + tmdbData?.data?.backdrop_path),
         logo_url,
         genres,
         seasons: tmdbData?.data?.seasons?.map((s: any) => ({
             name: s?.name,
             air_date: new Date(s?.air_date),
             description: s?.overview,
-            vertical_cover_url: 'https://image.tmdb.org/t/p/original' + s?.poster_path
+            vertical_cover_url: !s?.poster_path ? null : ('https://image.tmdb.org/t/p/original' + s?.poster_path)
         })),
         episodes: episodeIDs,
     }, { upsert: true, returnDocument: 'after' }).populate('episodes').populate('genres');
