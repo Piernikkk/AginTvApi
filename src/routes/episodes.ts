@@ -1,7 +1,8 @@
-import Episode, { EpisodeType } from '../models/Episode';
+import Episode, { TEpisode } from '../models/Episode';
 import express, { Request } from 'express';
 import { MovieParams } from './movies';
-import withAuth, { withAuthParams } from '@/functions/withAuth';
+import withAuth from '../functions/withAuth';
+import Position from '../models/Position';
 
 const episodes = express.Router({ mergeParams: true });
 
@@ -23,30 +24,43 @@ episodes.use('/:episodeID', withAuth, async (req: Request<EpisodeParams>, res, n
         return;
     }
 
-    req.episode = episodeData as unknown as EpisodeType;
+    req.episode = episodeData as unknown as TEpisode; episode
+
+    next();
 });
 
 episodes.get('/:episodeID', withAuth, async (req: Request<EpisodeParams>, res) => {
-    const { movieID, episodeID } = req?.params;
-
-    const tmp = episodeID.split(',');
-    const season = tmp[0];
-    const episode = tmp[1];
-
-    const episodeData = await Episode.findOne({ tmdb_movie_id: movieID, episode, season })
-
-    if (episodeData == null) {
-        res.status(404).json({ error: `Episode not found or doesn't exist in the database` });
-        return;
-    }
-
-    res.json(episodeData);
+    res.json(req.episode);
     return;
 });
 
 episodes.patch('/:episodeID/position', async (req: Request<EpisodeParams>, res) => {
-    const { movieID, } = req?.params;
+    const { position, duration, link } = req?.body;
 
+    if (position == null || duration == null || link == null) {
+        res.status(400).json({ error: 'Missing required information' });
+        return;
+    }
+
+    //TODO: add link validation
+
+    const episode = req.episode;
+    const user = req.user;
+
+    await Position.findOneAndUpdate({ episode: episode?._id, user: user?._id }, { position, duration, link }, { upsert: true, returnDocument: 'after' })
+
+    res.sendStatus(200);
+    return;
+});
+
+episodes.get('/:episodeID/position', async (req: Request<EpisodeParams>, res) => {
+    const episode = req.episode;
+    const user = req.user;
+
+    const position = await Position.findOne({ episode: episode?._id, user: user?._id });
+
+    res.json(position);
+    return;
 });
 
 export default episodes;

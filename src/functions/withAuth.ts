@@ -1,13 +1,13 @@
 import mongoose from "mongoose";
 import Token from "../models/Token";
 import { NextFunction, Request, Response } from "express";
-import Episode, { EpisodeType } from "../models/Episode";
+import Episode, { TEpisode } from "../models/Episode";
 
 declare module "express-serve-static-core" {
     interface Request {
         token?: { token: string, grantedAt: NativeDate };
         user?: any;
-        episode?: EpisodeType;
+        episode?: TEpisode;
     }
 }
 

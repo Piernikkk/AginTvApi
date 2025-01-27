@@ -12,7 +12,7 @@ const episodeSchema = new mongoose.Schema({
     duration: Number,
 });
 
-export type EpisodeType = mongoose.Document & {
+export type TEpisode = mongoose.Document & {
     season: number;
     episode: number;
     movie_name: string;

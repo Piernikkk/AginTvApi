@@ -18,10 +18,10 @@
     "checkJs": false,                         /* Disable type checking for JavaScript files. */
     
     /* Paths & Aliases */
-    "baseUrl": "./",                          /* Base directory for resolving non-relative paths. */
-    "paths": {
-      "@/*": ["./src/*"]                        /* Alias '@' to the 'src' folder. */
-    },
+    // "baseUrl": "./",                          /* Base directory for resolving non-relative paths. */
+    // "paths": {
+    //   "@/*": ["./src/*"]                        /* Alias '@' to the 'src' folder. */
+    // },
 
     /* Type Checking */
     "noImplicitAny": true,                    /* Disallow 'any' types unless explicitly declared. */
@@ -33,7 +33,7 @@
     "sourceMap": true,                        /* Generate source maps for debugging. */
     "inlineSources": true                     /* Include source code in source maps. */
   },
-  "include": ["src/**/*"],                    /* Include all TypeScript and JavaScript files in the 'src' directory. */
+  "include": ["./src/**/*"],                    /* Include all TypeScript and JavaScript files in the 'src' directory. */
   "exclude": ["node_modules", "build"],
   "ts-node": {"files": true}
 }
