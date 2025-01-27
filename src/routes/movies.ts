@@ -3,7 +3,7 @@ import Movie from './../models/Movie';
 import addMovieFromTMDB from '../functions/addMovie';
 import episodes from './episodes';
 
-const movies = express.Router();
+const movies = express.Router({ mergeParams: true });
 
 export interface MovieParams {
     movieID: string,
