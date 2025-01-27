@@ -1,4 +1,4 @@
-import Episode from '../models/Episode';
+import Episode, { EpisodeType } from '../models/Episode';
 import express, { Request } from 'express';
 import { MovieParams } from './movies';
 import withAuth, { withAuthParams } from '@/functions/withAuth';
@@ -18,12 +18,12 @@ episodes.use('/:episodeID', withAuth, async (req: Request<EpisodeParams>, res, n
 
     const episodeData = await Episode.findOne({ tmdb_movie_id: movieID, episode, season })
 
-    if (episodeData == null) {
+    if (episodeData == null || episodeData == undefined) {
         res.status(404).json({ error: `Episode not found or doesn't exist in the database` });
         return;
     }
 
-    req.episode = episodeData;
+    req.episode = episodeData as unknown as EpisodeType;
 });
 
 episodes.get('/:episodeID', withAuth, async (req: Request<EpisodeParams>, res) => {
