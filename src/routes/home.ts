@@ -16,7 +16,7 @@ home.get('/', withAuth, async (req, res) => {
             name: hm.movie?.name,
             background_url: hm.movie?.background_url,
             description: hm.movie?.description,
-            logo_url: hm.movie?.logo_url
+            logo_url: hm.movie?.logo_url,
         }
     });
 
