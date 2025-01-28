@@ -23,11 +23,12 @@ async function getEpisodes({ movieID, tmdbData }: getEpisodeProps) {
     await Promise.all(tmdbData?.data?.seasons?.map(async (s: any) => {
         const season = await TMDB.get(`/tv/${movieID.substring(1)}/season/${s.season_number}`);
         return await Promise.all(season?.data?.episodes?.map(async (e: any) => {
+            const cover_url = !e?.still_path ? null : ('https://image.tmdb.org/t/p/original' + e?.still_path)
             const episode = await Episode.findOneAndUpdate({ tmdb_movie_id: movieID, season: e.season_number, episode: e?.episode_number }, {
                 name: e?.name,
                 description: e?.overview,
                 air_date: new Date(e?.air_date),
-                cover_url: e?.still_path,
+                cover_url,
                 duration: e?.runtime,
                 movie_name: tmdbData?.data?.name,
             }, { upsert: true, returnDocument: 'after' });

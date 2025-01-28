@@ -22,7 +22,9 @@ home.get('/', withAuth, async (req, res) => {
 
     const user = req?.user;
 
-    const continueWatching = await Position.find({ user: user?._id }).populate({ path: 'episode', model: Episode }).select('-__v');
+    const continueWatching = await Position.find({ user: user?._id })
+        .populate({ path: 'episode', model: Episode, select: '-__v -description -duration -_id -air_date' })
+        .select('-__v -_id -user');
 
     res.json({ carousel, continueWatching });
     return;
