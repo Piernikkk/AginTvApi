@@ -70,4 +70,11 @@ user.post('/login', async (req, res) => {
     res.json({ token });
 });
 
+user.delete('/logout', withAuth, async (req, res) => {
+    const token = req.token?.token;
+    await Token.findOneAndDelete({ token });
+
+    res.sendStatus(204);
+});
+
 export default user;
