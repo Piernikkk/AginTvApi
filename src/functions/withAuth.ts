@@ -13,6 +13,8 @@ declare module "express-serve-static-core" {
 
 export interface withAuthParams {
     token: string,
+    // movieID: string,
+    // collectionID: string,
 }
 
 export default async function withAuth(req: Request<withAuthParams>, res: Response<any, Record<string, any>>, next: NextFunction) {

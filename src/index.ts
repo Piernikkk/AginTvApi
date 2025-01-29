@@ -5,6 +5,7 @@ import movies from './routes/movies';
 import home from './routes/home';
 import user from './routes/user';
 import files from './routes/files';
+import collections from './routes/collections';
 
 const app = express();
 
@@ -34,6 +35,8 @@ app.use('/home', home);
 app.use('/user', user);
 
 app.use('/files', files);
+
+app.use('/collections', collections);
 
 
 

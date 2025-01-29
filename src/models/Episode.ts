@@ -10,12 +10,12 @@ const episodeSchema = new mongoose.Schema({
     cover_url: String,
     tmdb_movie_id: String,
     duration: Number,
-    sources: [{
-        url: String,
-        quality: String,
-        sub: [String],
-        dub: [String],
-    }]
+    sources: [
+        {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: 'File',
+        }
+    ]
 });
 
 export type TEpisode = mongoose.Document & {
@@ -28,12 +28,7 @@ export type TEpisode = mongoose.Document & {
     cover_url: string;
     tmdb_movie_id: string;
     duration: number;
-    sources: [{
-        url: String,
-        quality: String,
-        sub: String[],
-        dub: String[],
-    }]
+    sources: mongoose.Types.ObjectId[];
 };
 
 export default mongoose.model('Episode', episodeSchema);
