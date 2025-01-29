@@ -48,7 +48,7 @@ const movieSchema = new mongoose.Schema<TMovie>({
     episodes: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Episode'
-    }]
+    }],
 });
 
 export default mongoose.model<TMovie>('Movie', movieSchema);

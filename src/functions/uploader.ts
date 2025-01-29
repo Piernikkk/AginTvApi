@@ -1,6 +1,13 @@
 import multer from 'multer';
 import fs from 'fs';
 import path from 'path';
+import Movie from '../models/Movie';
+import { Request } from 'express';
+import Episode from '../models/Episode';
+
+export interface MulterRequest extends Request {
+    episode?: any;
+}
 
 const allowedExtensions = ['.mp4', '.m4a', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
@@ -14,19 +21,30 @@ const sanitizeFilename = (filename: string): string => {
         .toLowerCase();
 };
 
+const isEpisodeInDatabase = async (movie_id: string, episode: number, season: number, cb: (error: Error | null, destination: string) => void) => {
+    const data = await Episode.findOne({ tmdb_movie_id: movie_id, season, episode });
+
+    if (!data) {
+        cb(new Error('Episode not found'), '');
+        return;
+    }
+    return data;
+}
+
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        const movieId = req.body.movie_id;
+    destination: async (req: MulterRequest, file, cb) => {
+        const { movie_id, episode, season } = req.body;
 
-        console.log('movieId', movieId);
-
-        if (!movieId || !isMovieValid(movieId)) {
-            cb(new Error('Invalid project ID'), '');
+        if (!movie_id || !isMovieValid(movie_id) || !episode || !season) {
+            cb(new Error('Invalid movie or episode ID'), '');
             return;
         }
 
+        const data = await isEpisodeInDatabase(movie_id, episode, season, cb);
+        req.episode = data;
+
         const baseUploadPath = path.resolve('uploads');
-        const targetDir = path.join(baseUploadPath, movieId);
+        const targetDir = path.join(baseUploadPath, movie_id);
 
         if (!targetDir.startsWith(baseUploadPath)) {
             cb(new Error('Invalid upload path'), '');
@@ -55,8 +73,6 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    console.log('File filter called');
-
     const ext = path.extname(file.originalname).toLowerCase();
     if (!allowedExtensions.includes(ext)) {
         cb(new Error('Invalid file type'));
