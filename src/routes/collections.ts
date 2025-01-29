@@ -21,7 +21,7 @@ collections.get('/system/:collectionID', withAuth, async (req: express.Request<C
     const collection = await Collections.findOne({ system_collection: collection_id, user: req.user._id }).populate('movies');
 
     //@ts-ignore
-    res.json(collection?.movies?.map((movie) => movie?.tmdb_id));
+    res.json(collection?.movies);
 });
 
 export default collections;
