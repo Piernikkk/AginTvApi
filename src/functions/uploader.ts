@@ -78,6 +78,13 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
         cb(new Error('Invalid file type'));
         return;
     }
+    req.on('aborted', () => {
+        file.stream.on('end', () => {
+            console.log('Cancel the upload')
+            cb(new Error('Cancel.'));
+        });
+        file.stream.emit('end');
+    })
     cb(null, true);
 };
 

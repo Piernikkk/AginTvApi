@@ -9,21 +9,7 @@ import fs from 'fs';
 
 const files = express.Router({ mergeParams: true });
 
-files.post('/upload', withAuth as unknown as express.RequestHandler, (req, res, next) => {
-    req.on('close', () => {
-        console.error('Failed to delete incomplete upload:');
-        if (req.file && req.file.path) {
-            fs.unlink(req.file.path, (err) => {
-                if (err) {
-                    console.error('Failed to delete incomplete upload:', err);
-                } else {
-                    console.log('Incomplete upload deleted:', req?.file?.path);
-                }
-            });
-        }
-    });
-    next();
-}, upload.single("file"), async (req: MulterRequest, res) => {
+files.post('/upload', withAuth as unknown as express.RequestHandler, upload.single("file"), async (req: MulterRequest, res) => {
     if (!req?.file) {
         res.status(400).json({ error: 'No file uploaded' });
         return;
