@@ -5,10 +5,25 @@ import FIleM from '../models/FIleM';
 import Episode from '../models/Episode';
 import Movie from '../models/Movie';
 import Collections from '../models/Collections';
+import fs from 'fs';
 
 const files = express.Router({ mergeParams: true });
 
-files.post('/upload', withAuth as unknown as express.RequestHandler, upload.single("file"), async (req: MulterRequest, res) => {
+files.post('/upload', withAuth as unknown as express.RequestHandler, (req, res, next) => {
+    req.on('close', () => {
+        console.error('Failed to delete incomplete upload:');
+        if (req.file && req.file.path) {
+            fs.unlink(req.file.path, (err) => {
+                if (err) {
+                    console.error('Failed to delete incomplete upload:', err);
+                } else {
+                    console.log('Incomplete upload deleted:', req?.file?.path);
+                }
+            });
+        }
+    });
+    next();
+}, upload.single("file"), async (req: MulterRequest, res) => {
     if (!req?.file) {
         res.status(400).json({ error: 'No file uploaded' });
         return;
@@ -28,7 +43,6 @@ files.post('/upload', withAuth as unknown as express.RequestHandler, upload.sing
     const movie = await Movie.findOne({ tmdb_id: req.episode.tmdb_movie_id });
     await Episode.findByIdAndUpdate(req.episode._id, { $push: { sources: fileDatabase._id } });
     await Collections.findOneAndUpdate({ user: req.user._id, system_collection: 'library' }, { $push: { movies: movie?._id } }, { upsert: true });
-
 
     res.json(fileData);
 });
