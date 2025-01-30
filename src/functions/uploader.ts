@@ -9,6 +9,7 @@ export interface MulterRequest extends Request {
     episode?: any;
 }
 
+// TODO: change to actually supported file types
 const allowedExtensions = ['.mp4', '.m4a', '.jpg', '.jpeg', '.png', '.gif', '.webp'];
 
 const isMovieValid = (movieId: string): boolean => {
@@ -21,13 +22,9 @@ const sanitizeFilename = (filename: string): string => {
         .toLowerCase();
 };
 
-const isEpisodeInDatabase = async (movie_id: string, episode: number, season: number, cb: (error: Error | null, destination: string) => void) => {
+const isEpisodeInDatabase = async (movie_id: string, episode: number, season: number, cb: multer.FileFilterCallback) => {
     const data = await Episode.findOne({ tmdb_movie_id: movie_id, season, episode });
 
-    if (!data) {
-        cb(new Error('Episode not found'), '');
-        return;
-    }
     return data;
 }
 
@@ -35,13 +32,7 @@ const storage = multer.diskStorage({
     destination: async (req: MulterRequest, file, cb) => {
         const { movie_id, episode, season } = req.body;
 
-        if (!movie_id || !isMovieValid(movie_id) || !episode || !season) {
-            cb(new Error('Invalid movie or episode ID'), '');
-            return;
-        }
 
-        const data = await isEpisodeInDatabase(movie_id, episode, season, cb);
-        req.episode = data;
 
         const baseUploadPath = path.resolve('uploads');
         const targetDir = path.join(baseUploadPath, movie_id);
@@ -72,12 +63,27 @@ const storage = multer.diskStorage({
     }
 });
 
-const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const fileFilter = async (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const { movie_id, episode, season } = req.body;
+
+    if (!movie_id || !isMovieValid(movie_id) || !episode || !season) {
+        cb(new Error('Invalid movie or episode ID'));
+        return;
+    }
+
+    const data = await isEpisodeInDatabase(movie_id, episode, season, cb);
+    if (!data) {
+        cb(new Error('Episode not found'));
+        return;
+    }
+    req.episode = data;
+
     const ext = path.extname(file.originalname).toLowerCase();
     if (!allowedExtensions.includes(ext)) {
         cb(new Error('Invalid file type'));
         return;
     }
+
     req.on('aborted', () => {
         file.stream.on('end', () => {
             console.log('Cancel the upload')
@@ -93,7 +99,8 @@ const upload = multer({
     fileFilter,
     limits: {
         files: 1
-    }
+    },
+
 });
 
 export default upload;
