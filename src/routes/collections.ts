@@ -10,17 +10,14 @@ export interface CollectionParams extends withAuthParams {
 
 collections.get('/system/:collectionID', withAuth, async (req: express.Request<CollectionParams>, res) => {
     const collection_id = req.params.collectionID;
-    console.log(collection_id);
-
 
     if (!collection_id) {
         res.status(400).json({ message: 'collection_id is required' });
         return;
     }
 
-    const collection = await Collections.findOne({ system_collection: collection_id, user: req.user._id }).populate('movies');
+    const collection = await Collections.findOne({ system_collection: collection_id, user: req.user._id }).populate({ path: 'movies', populate: { path: 'genres', model: 'Genre' } });
 
-    //@ts-ignore
     res.json(collection?.movies);
 });
 
