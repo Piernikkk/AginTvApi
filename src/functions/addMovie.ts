@@ -105,6 +105,7 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
         seasons: tmdbData?.data?.seasons?.map((s: any) => ({
             name: s?.name,
             air_date: new Date(s?.air_date),
+            season_number: s?.season_number,
             description: s?.overview,
             vertical_cover_url: !s?.poster_path ? null : ('https://image.tmdb.org/t/p/original' + s?.poster_path)
         })),
