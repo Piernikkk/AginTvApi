@@ -21,13 +21,14 @@ movies.use('/:movieID', withAuth, (req: express.Request<MovieParams>, res, next)
 
 movies.get('/:movieID', withAuth, async (req: express.Request<MovieParams>, res) => {
     const { movieID } = req?.params;
+    const sources = req.query?.sources == 'true';
     const refresh = req.query?.refresh == 'true';
     if (refresh) {
         await addMovieFromTMDB({ movieID, res });
         return;
     }
 
-    const database = await Movie.findOne({ tmdb_id: movieID }).populate('episodes').populate('genres');
+    const database = sources ? await Movie.findOne({ tmdb_id: movieID }).populate({ path: 'episodes', populate: { path: 'sources', model: 'File' } }).populate('genres') : await Movie.findOne({ tmdb_id: movieID }).populate('episodes').populate('genres')
 
     if (database == null) {
         await addMovieFromTMDB({ movieID, res });

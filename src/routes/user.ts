@@ -10,6 +10,7 @@ const user = express.Router({ mergeParams: true });
 
 user.get('/', withAuth, async (req, res) => {
     res.json({
+        _id: req.user._id,
         username: req.user.username,
         email: req.user.email,
         avatar: req.user.avatar,

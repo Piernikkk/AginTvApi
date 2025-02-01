@@ -6,6 +6,7 @@ import home from './routes/home';
 import user from './routes/user';
 import files from './routes/files';
 import collections from './routes/collections';
+import cors from 'cors';
 
 const app = express();
 
@@ -16,14 +17,12 @@ mongoose.connect('mongodb://localhost/aginTV');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-});
-
+app.use(cors({
+    origin: '*', // Allow all origins. Change this to your frontend's origin in production.
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+    credentials: true // Allow credentials if needed
+}));
 app.options('*', (req, res) => {
     res.sendStatus(200);
 });

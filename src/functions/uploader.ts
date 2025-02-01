@@ -78,11 +78,16 @@ const fileFilter = async (req: any, file: Express.Multer.File, cb: multer.FileFi
     }
     req.episode = data;
 
-    const ext = path.extname(file.originalname).toLowerCase();
-    if (!allowedExtensions.includes(ext)) {
+    if (!file.mimetype.startsWith('video/')) {
         cb(new Error('Invalid file type'));
         return;
     }
+
+    // const ext = path.extname(file.originalname).toLowerCase();
+    // if (!allowedExtensions.includes(ext)) {
+    //     cb(new Error('Invalid file type'));
+    //     return;
+    // }
 
     req.on('aborted', () => {
         file.stream.on('end', () => {
