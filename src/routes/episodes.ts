@@ -17,6 +17,11 @@ episodes.use('/:episodeID', withAuth, async (req: Request<EpisodeParams>, res, n
     const season = tmp[0];
     const episode = tmp[1];
 
+    if (!season || !episode) {
+        res.status(400).json({ error: 'Invalid episode ID' });
+        return;
+    }
+
     const episodeData = await Episode.findOne({ tmdb_movie_id: movieID, episode, season }).populate({ path: 'sources', populate: { path: 'user', model: 'User', select: 'username' } });
 
     if (episodeData == null || episodeData == undefined) {
