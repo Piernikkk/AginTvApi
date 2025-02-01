@@ -6,13 +6,17 @@ import home from './routes/home';
 import user from './routes/user';
 import files from './routes/files';
 import collections from './routes/collections';
+import dotenv from 'dotenv';
 import cors from 'cors';
+
+
+dotenv.config();
 
 const app = express();
 
 const httpServer = createServer(app);
 
-mongoose.connect('mongodb://localhost/aginTV');
+mongoose.connect(process.env.DATABASE_URI ?? 'mongodb://localhost/aginTV');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -43,4 +47,4 @@ app.use('/collections', collections);
 
 
 
-httpServer.listen(42070);
+httpServer.listen(process.env.PORT ?? 42070);
