@@ -19,7 +19,7 @@ user.get('/', withAuth, async (req, res) => {
     });
 });
 
-user.post('/register', withAdminAuth, async (req, res) => {
+user.post('/register', async (req, res) => {
     const { username, password, email } = req.body;
 
     if (!username || !password || !email) {
