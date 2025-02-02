@@ -8,6 +8,8 @@ import files from './routes/files';
 import collections from './routes/collections';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import withAuth from './functions/withAuth';
+import { TMDB } from './constants/tmdb';
 
 
 dotenv.config();
@@ -44,6 +46,29 @@ app.use('/user', user);
 app.use('/files', files);
 
 app.use('/collections', collections);
+
+
+app.get('/search', withAuth, async (req, res): Promise<void> => {
+    const { query } = req?.query;
+    if (!query) {
+        res.status(400).json({ error: 'Query is missing' });
+        return;
+    }
+    const search = await TMDB.get(`https://api.themoviedb.org/3/search/multi`, { params: { query } });
+    const response = search.data?.results?.map((d: any) => {
+        return ({
+            tv: d?.media_type == 'tv',
+            name: d?.media_type == 'tv' ? d?.name : d?.title,
+            original_name: d?.original_name,
+            description: d?.overview,
+            vertical_cover_url: 'https://image.tmdb.org/t/p/original' + d?.poster_path,
+            horizontal_cover_url: 'https://image.tmdb.org/t/p/original' + d?.backdrop_path,
+            tmdb_id: `${d?.media_type == 'tv' ? 't' : 'm'}${d?.id}`
+
+        })
+    })
+    res.json(response);
+});
 
 
 
