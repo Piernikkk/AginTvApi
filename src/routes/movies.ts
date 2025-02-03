@@ -28,7 +28,7 @@ movies.get('/:movieID', withAuth, async (req: express.Request<MovieParams>, res)
         return;
     }
 
-    const database = sources ? await Movie.findOne({ tmdb_id: movieID }).populate({ path: 'episodes', populate: { path: 'sources', model: 'File' } }).populate('genres') : await Movie.findOne({ tmdb_id: movieID }).populate('episodes').populate('genres')
+    const database = sources ? await Movie.findOne({ tmdb_id: movieID }).populate({ path: 'episodes', populate: { path: 'sources', populate: { path: 'user', model: 'User' }, model: 'File' } }).populate('genres') : await Movie.findOne({ tmdb_id: movieID }).populate({ path: 'episodes', populate: { path: 'sources', populate: { path: 'user', model: 'User' }, model: 'File' } }).populate('genres');
 
     if (database == null) {
         await addMovieFromTMDB({ movieID, res });
