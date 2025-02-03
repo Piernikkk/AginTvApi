@@ -18,7 +18,7 @@ const app = express();
 
 const httpServer = createServer(app);
 
-mongoose.connect(process.env.DATABASE_URI ?? 'mongodb://localhost:27019/aginTV');
+mongoose.connect(process.env.DATABASE_URI ?? 'mongodb://localhost:27017/aginTV');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
