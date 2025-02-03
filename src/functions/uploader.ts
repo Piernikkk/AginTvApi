@@ -4,6 +4,7 @@ import path from 'path';
 import Movie from '../models/Movie';
 import { Request } from 'express';
 import Episode from '../models/Episode';
+import addMovieFromTMDB from './addMovie';
 
 export interface MulterRequest extends Request {
     episode?: any;
@@ -71,10 +72,16 @@ const fileFilter = async (req: any, file: Express.Multer.File, cb: multer.FileFi
         return;
     }
 
-    const data = await isEpisodeInDatabase(movie_id, episode, season, cb);
+    let data = await isEpisodeInDatabase(movie_id, episode, season, cb);
     if (!data) {
-        cb(new Error('Episode not found'));
-        return;
+        console.log(movie_id);
+
+        await addMovieFromTMDB({ movieID: movie_id });
+        data = await isEpisodeInDatabase(movie_id, episode, season, cb);
+        if (!data) {
+            cb(new Error('Episode not found'));
+            return;
+        }
     }
     req.episode = data;
 

@@ -9,7 +9,7 @@ import Genre from "../models/Genre";
 
 export type addMovieProps = {
     movieID: String,
-    res: Response<any, Record<string, any>>
+    res?: Response<any, Record<string, any>>
 }
 
 export type getEpisodeProps = {
@@ -64,7 +64,7 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
     const tmdbData = await TMDB.get(`/${isTV ? 'tv' : 'movie'}/${movieID.substring(1)}`, { params: { append_to_response: 'keywords,images' } }).catch(() => null);
 
     if (tmdbData == null) {
-        return res.status(404).json({ error: 'Invalid ID' });
+        return res?.status(404).json({ error: 'Invalid ID' });
     }
 
     const horizontal_cover = (tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == 'en')?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == tmdbData?.data?.original_language)?.file_path || tmdbData?.data?.images?.backdrops?.find((b: any) => b.iso_639_1 == null)?.file_path || tmdbData?.data?.images?.backdrops[0]?.file_path)
@@ -112,6 +112,6 @@ export default async function addMovieFromTMDB({ movieID, res }: addMovieProps) 
         episodes: episodeIDs,
     }, { upsert: true, returnDocument: 'after' }).populate('episodes').populate('genres');
 
-    return res.json(movie);
+    return res?.json(movie);
 
 }
