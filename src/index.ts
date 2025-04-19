@@ -37,7 +37,7 @@ app.use(cors({
     credentials: false
 }));
 
-app.options('*', cors());
+// app.options('*', cors());
 
 app.get('/', async (req, res) => {
     res.json({ name: 'AginTvApi', version: '0.0.1' });
