@@ -23,15 +23,21 @@ mongoose.connect(process.env.DATABASE_URI ?? 'mongodb://localhost:27017/aginTV')
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// app.use(cors({
+//     origin: process.env.FRONTEND_URL || 'http://localhost:3000', // Replace with your frontend URL
+//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+//     credentials: true
+// }));
+
 app.use(cors({
-    origin: '*', // Allow all origins. Change this to your frontend's origin in production.
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
-    credentials: true // Allow credentials if needed
+    credentials: false
 }));
-app.options('*', (req, res) => {
-    res.sendStatus(200);
-});
+
+app.options('*', cors());
 
 app.get('/', async (req, res) => {
     res.json({ name: 'AginTvApi', version: '0.0.1' });
